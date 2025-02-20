@@ -28,7 +28,7 @@
 	<body>
 		<div class="container">
 		<h1>CS184/284A Spring 2025 Homework 1 Write-Up</h1>
-		<div style="text-align: center;">Names: </div>
+		<div style="text-align: center;">James Ni and Sonia Chacon</div>
 
 		<br>
 
@@ -36,77 +36,267 @@
 		
 		<br>
 
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
-
-		<figure>
-			<img src="lion.jpg" alt="Lion" style="width:50%"/>
-			<figcaption>You can add images with captions!</figcaption>
-		</figure>
+		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/sp25-hw1-sonia/">github.com/cal-cs184-student/sp25-hw1-sonia</a>
 
 		<!--
 		We've already added one heading per task, to make your write-up as navigable when grading. Please fit your write-up within these sections!
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+			In this assignment, we implemented a triangle rasterizer from an incremental perspective. We started from a
+			barebones rasterizer,
+			Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			We rasterize a triangle by first identifying the winding order of the triangle using the cross product of
+			its vertices. If the cross product is less than 0, then we swap the 2nd and 3rd vertices such that the
+			winding order is always counter-clockwise. This ensures that the boundary between triangles is consistent.
+			<br><br>
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
-		<div style="display: flex; flex-direction: column; align-items: center;">
-			<table style="width: 100%; text-align: center; border-collapse: collapse;">
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="lion.jpg" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="lion.jpg" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="lion.jpg" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="lion.jpg" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			</table>
-		</div>
-		
+			Next, we identify the minimal bounding box by taking the minimum and maximum \(xy\) coordinates of the
+			triangle. For each pixel, we sample the midpoint by checking if the midpoint is within the triangle using
+			the point in triangle 3 line test. If the midpoint is inside the triangle, we fill that pixel with its
+			color; otherwise, we leave it unchanged. <br><br>
+
+			<figure>
+				<img src="images/task1_triangles.png" alt="task_1_triangles" style="width:50%"/>
+				<figcaption>Figure 1: Four triangles rendered by our basic rasterizer. Observe the jaggies generated
+					when rendering the red triangle, and imperfections in the green triangle shown by the pixel
+					inspector.</figcaption>
+			</figure>
+
+			We implemented two optimizations to make our rasterizer faster. Because single-color rasterization doesn't
+			depend on the orientation of the boundary of the triangles, our original implementation does not swap the
+			vertices and instead uses the winding order in the point in triangle check. Performing the winding order
+			check before any pixels are checked and swapping the vertices saves a cross-product computation for every
+			point in the bounding box. Our original implementation has a time of 105.055ms abd this optimization
+			brought it down to 46.6484ms.<br><br>
+
+			Using basic properties of geometry, we can show that the at least 50% of the pixels in the minimal bounding
+			box of the triangle are not within the triangle. This implies at least a 2x reduction of point in triangle
+			checks by using a scanline algorithm to loop through the vertices in the triangle. First, we have to make
+			sure that the triangle orientation is counterclockwise, so we swap points if needed to ensure that
+			orientation. Then we can determine the two lines that are made by the triangle. There are some edge cases,
+			for example, a right triangle, which would have a vertical line. In this case, we would swap the points
+			being used to calculate the line. These lines create the minimum and maximum bounds for y for a given x. So,
+			for each x value, we would calculate the y bounds and only check pixels in that range, which cuts out a lot
+			of checks, reducing runtime.  Because we implemented a \(y\)-axis scanline, the speedup from a scanline
+			algorithm is relatively small due to cache misses, on top of the relatively small computational overhead of
+			the \(x\)-coordinate scanline endpoints. This optimization brought our time to 36.2956ms. <br><br>
+
+			<div style="display: flex; flex-direction: column; align-items: center;">
+				<table style="width: 100%; text-align: center; border-collapse: collapse;">
+					<tr>
+						<th>Base</th>
+						<th>Winding Order (WO)</th>
+						<th>Scanline + WO</th>
+					</tr>
+					<tr>
+						<td>105.055ms</td>
+						<td>46.6486ms</td>
+						<td>36.2956ms</td>
+					</tr>
+				</table>
+				<figcaption><br> Table 1: A table comparing the wall clock time of various rasterization optimization techniques implemented, using the dragon file <code>svg/basic/test3.svg</code> as a benchmark. </figcaption>
+			</div>
+
 		<h2>Task 2: Antialiasing by Supersampling</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			Supersampling also iterates through all the points in the triangle similar to regular rasterization, except
+			each pixel is sampled \(k^2\) times, where \(k^2\) is our sample rate. This is done by subdividing the pixel
+			into a \(k \times k\) region of subpixels. In each of these samples, we take the midpoint, and assign the frame buffer its color if that sample is inside the triangle. Then, when we resolve the triangle to the framebuffer, we average out the RGB values of the supersamples of each pixel, and assign the pixel the average. <br><br>
+
+			In order to implement supersampling, we also modified the size of the frame buffer in order to accommodate
+			\(k^2\) samples per pixel. The frame buffer has a new size of \( k^2 WH\), where \(W, H\) refer to the width
+			and height of the image. When a new sample rate is selected, the frame buffer is resized accordingly. We
+			also modified the <code>fill_pixel</code> function to fill \(k^2\) samples per pixel, so that line and
+			point rasterization functionality remained the same.
+
+			<div style="display: flex; flex-direction: column; align-items: center;">
+				<table style="width: 100%; text-align: center; border-collapse: collapse;">
+					<tr>
+						<td style="text-align: center;">
+							<img src="images/task2_1.png" width="250px"/>
+							<figcaption>Sample Rate of 1</figcaption>
+						</td>
+						<td style="text-align: center;">
+							<img src="images/task2_4.png" width="250px"/>
+							<figcaption>Sample Rate of 4</figcaption>
+						</td>
+						<td style="text-align: center;">
+							<img src="images/task2_16.png" width="250px"/>
+							<figcaption>Sample Rate of 16</figcaption>
+						</td>
+					</tr>
+				</table>
+				<figcaption><br> Figure 2: Four triangles demonstrating the advantages of supersampling. Each image is
+					identical, except for the sample rate. The high frequency signal of the red triangle's boundary,
+					shown by the pixel inspector, results in aliasing effects when the sample rate is 1. A sample rate
+					of 4 results in a sufficiently high sample frequency to incorporate high frequency information about
+					the triangle's boundary and largely remove aliasing. <br><br></figcaption>
+			</div>
+
+			At a high level, supersampling is useful because it blurs out areas of high contrast, such as the boundaries
+			of a triangle, removing jagged edges. Fundamentally, these areas of high contrast are examples of high
+			frequency signals in the underlying data. When we supersample, the higher sampling frequency allows us to
+			incorporate this missing information. Downsampling is necessary to retain high frequency information at the
+			true, lower rendering rate, introducing a blur and smoothing effect.
 
 		<h2>Task 3: Transforms</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+			For this task, we merely implemented the basic 2D transforms in homogenous coordinates. In order to validate
+			the correctness of our transforms, we rendered a cube-man jumping. Elbow and knee joints were created by
+			splitting the translation between the upper and lower appendages into a translation &#x2192; rotation
+			&#x2192; translation. This technique can be used for all the bodies of the robot, allowing for highly
+			dynamic movement.
+
+			<figure>
+				<img src="images/robot_jump.png" alt="robot_jump" style="width:50%"/>
+				<figcaption>Figure 3: A cubeman jumping.</figcaption>
+			</figure>
 
 		<h2>Task 4: Barycentric coordinates</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+			<figure>
+				<img src="images/color_triangle.png" alt="color_triangle" style="width:50%"/>
+				<figcaption> Figure 4: A color triangle with red, green, and blue vertices, and intermediate values
+					computed using barycentric coordinates.</figcaption>
+			</figure>
+
+			If we want to rasterize a triangle whose pixel value is dependent on the pixel position in the triangle,
+			then we need to use barycentric coordinates. Any point on a line segment can be represented by a convex
+			combination \((\lambda, 1 - \lambda)\) of its endpoints, and hence, if each endpoint admits a value, the
+			value at any intermediate point can also be determined. <br><br>
+
+			Barycentric coordinates generalizes this concept to triangles under similar conditions. We can parametrize
+			any point inside the triangle as a convex combination \((\alpha, \beta, \gamma)\) of the vertices, where
+			\(\alpha + \beta + \gamma = 1\). Then similarly, if each vertex admits a value, for example, a color or
+			point in texture space, we can determine the corresponding color or texture space coordinate for a point
+			within the triangle. Each parameter is inversely proportional to the distance to its corresponding vertex.
+			From Figure 4, we can see that points in the triangle close to the red vertex are more red, indicating that
+			the parameter corresponding to that vertex is higher.
+
+			<figure>
+				<img src="images/color_wheel.png" alt="color_wheel" style="width:50%"/>
+				<figcaption><br> Figure 5: A color wheel consisting of colored triangles interpolated using barycentric
+					coordinates. Unlike the color triangle, the interpolated values here span the entire space of
+					visible colors.</figcaption>
+			</figure>
 
 		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+			In order to sample from a texture, we break up a texture into triangles and map certain triangles with
+			triangles on the image. However, two triangles mapped together are not necessarily congruent and can differ
+			by an affine transformation. In order to sample the appropriate texel, we model texture space as
+			\(uv\)-coordinates in the interval \([0, 1]\), and assign each texture triangle's vertex with its
+			corresponding coordinate in texture space. Barycentric coordinates allow us to interpolate the correct
+			texture space coordinate \((u, v)\) within the texture triangle, corresponding to the image space coordinate
+			\((x, y)\) within the image triangle. <br><br>
+
+			Textures themselves are discrete data at finite resolution, necessitating appropriate sampling techniques to
+			get the texel at a continuous point in texture space. Nearest neighbor sampling merely rounds each
+			\((u, v)\) to the nearest texel. Bilinear sampling considers all the closest texels (there are 4 of them in
+			2D) and performs a bilinear interpolation of the texels based on the distance from \((u, v)\) to each texel.
+			From Figure 6, we can see that details of textures suffer from aliasing when using nearest neighbor
+			sampling. Bilinear filtering acts as a \(2 \times 2\) blur, which can incorporate higher frequency
+			information for little cost, and applies a smoothing effect, even at high sampling rates.
+			<br><br>
+
+			<div style="display: flex; flex-direction: column; align-items: center;">
+				<table style="width: 100%; text-align: center; border-collapse: collapse;">
+					<tr>
+						<td style="text-align: center;">
+							<img src="images/world_map_l_zero_p_nearest_s_1.png" width="400px"/>
+							<figcaption>Nearest Neighbor, Sample Rate of 1</figcaption>
+						</td>
+						<td style="text-align: center;">
+							<img src="images/world_map_l_zero_p_bilinear_s_1.png" width="400px"/>
+							<figcaption>Bilinear, Sample Rate of 1</figcaption>
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align: center;">
+							<img src="images/world_map_l_zero_p_nearest_s_16.png" width="400px"/>
+							<figcaption>Nearest Neighbor, Sample Rate of 16</figcaption>
+						</td>
+						<td style="text-align: center;">
+							<img src="images/world_map_l_zero_p_bilinear_s_16.png" width="400px"/>
+							<figcaption>Bilinear, Sample Rate of 16</figcaption>
+						</td>
+					</tr>
+				</table>
+				<figcaption><br> Figure 6: A world map texture rendered using various pixel sampling techniques and
+					sampling rates. Without supersampling, aliasing effects can be seen with nearest neighbor sampling,
+					but not bilinear sampling. With supersampling, aliasing effects can no longer be seen, but bilinear
+					sampling still shows smoothness improvements. </figcaption>
+			</div>
 
 		<h2>Task 6: "Level Sampling" with mipmaps for texture mapping</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+			In the previous task, we discussed how textures are triangulated, mapped, and sampled. However, the texture
+			triangles larger in shape compared to their mapped image counterparts can cause aliasing effects, since the
+			high frequency features of the textures are sampled at a low frequency. Instead of supersampling the entire
+			image, we can successively precompute low-pass filters (in the form of blurs) of the original texture image
+			to filter out high frequency features, called a mipmap. <br><br>
+
+			In order to determine which level of filtering should be applied, we compute the number of texels difference
+			per pixel difference in \(x\) and \(y\) at the image space coordinate \((x, y)\). If the number of texels
+			difference is large, the frequency ratio between the texture and the image triangle is large. Multiple
+			methods of consolidating the difference in each direction exist, such as geometric mean (\(\ell_0\) norm) or
+			maximum (\(\ell_\infty\) norm). We opted for the maximum to more conservatively apply low-pass filters to
+			our image &#x2013; a geometric mean would result in smoother transitions between levels. Because of the
+			geometric-scaling-nature of successive low-pass blurs, the actual level of filtering applied is the log of
+			the maximal texel difference. <br><br>
+
+			Like with bilinear filtering, the computed level is continuous whereas mipmap levels are discrete integers.
+			Computed levels can be rounded to the nearest level, and sampling from the mipmap is nearly identical as
+			long as the texture space coordinates \((u, v)\) are properly normalized between \([0, 1]\) and rescaled to
+			the size of each mipmap level. The alternative is level interpolation, which samples from both neighboring
+			levels, followed by a weighted average based on the distance of the computed level to the neighboring
+			levels. <br><br>
+
+			<div style="display: flex; flex-direction: column; align-items: center;">
+				<table style="width: 100%; text-align: center; border-collapse: collapse;">
+					<tr>
+						<td style="text-align: center;">
+							<img src="images/L_ZERO-P_NEAREST.png" width="400px"/>
+							<figcaption>Level Zero, Nearest Neighbor</figcaption>
+						</td>
+						<td style="text-align: center;">
+							<img src="images/L_ZERO-P_LINEAR.png" width="400px"/>
+							<figcaption>Level Zero, Bilinear</figcaption>
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align: center;">
+							<img src="images/L_NEAREST-P_NEAREST.png" width="400px"/>
+							<figcaption>Nearest Level, Nearest Pixel</figcaption>
+						</td>
+						<td style="text-align: center;">
+							<img src="images/L_NEAREST-P_LINEAR.png" width="400px"/>
+							<figcaption>Nearest Level, Bilinear</figcaption>
+						</td>
+					</tr>
+				</table>
+				<figcaption><br> Figure 7: A cat texture rendered using various level and pixel sampling techniques.
+					For a high-detail texture such as this one, aliasing effects are not sharply noticeable by eye but
+					can be seen using the pixel inspector. Using a nearest-level sampling technique with mipmapping
+					approximates the effect of supersampling for the triangular texture regions with large sampling
+					frequency differences. The smoothing effect is compounded when using bilinear pixel sampling.
+					<br><br></figcaption>
+			</div>
+
+			Bilinear sampling applied to uniform textures can resolve most detail for little cost (relative to other
+			spects of the rasterization pipeline). However, in more complex textures with high variation in
+			triangulation, or textures with high detail, bilinear sampling is not sufficient. Mipmapping is an effective
+			technique with small storage overhead and decent cost. Bilinear sampling adds 3 lerps while level
+			calculations add 2 barycentric interpolations. However, numerous effective optimization techniques can be
+			done to speed up the performance of barycentric interpolation, which makes mipmapping further alluring. In
+			most cases, trilinear filtering is unnecessary.
 
 		<h2>(Optional) Task 7: Extra Credit - Draw Something Creative!</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
+			Skipped for now...
+
 		</div>
 	</body>
 </html>
