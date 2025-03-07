@@ -28,89 +28,300 @@
 	<body>
 		<div class="container">
 		<h1>CS184/284A Spring 2025 Homework 2 Write-Up</h1>
-		<div style="text-align: center;">Names: </div>
+		<div style="text-align: center;">Names: James Ni and Sonia Chacon</div>
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-paper-plane">cal-cs184-student.github.io/hw-webpages-paper-plane</a>
 
 		<br>
 		
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
-
-		<figure>
-			<img src="teapot.png" alt="Teapot" style="width:50%"/>
-			<figcaption>You can add images with captions!</figcaption>
-		</figure>
+		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/sp25-hw2-paper-plate">github.com/cal-cs184-student/sp25-hw2-paper-plate</a>
 
 		<!--
 		We've already added one heading per part, to make your write-up as navigable when grading. Please fit your write-up within these sections!
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
-		<h2>Section I: Bezier Curves and Surfaces</h2>
+			In Homework 2, the two main concepts we focused on were Bezier curves and triangle meshes implemented with the half-edge data structure. Bezier curves, and by extension Bezier surfaces, are used to create smooth curves and surfaces through de Castelijau's algorithm. Another way to represent a smooth surface is through triangle meshes, which makes up the second main concept of this assignment. We implemented various operations with triangle meshes which included edge splitting and edge flipping. Using these operations, we can subdivide an elementary mesh into a smoother one with more detail. Both approaches give us a way to construct arbitrary meshes.
 
-		<h3>Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			<h2>Section I: Bezier Curves and Surfaces</h2>
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
-		<div style="display: flex; flex-direction: column; align-items: center;">
-			<table style="width: 100%; text-align: center; border-collapse: collapse;">
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			</table>
-		</div>
+			<h3>Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
 
-		<h3>Part 2: Bezier surfaces with separable 1D de Casteljau</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			For each iteration of de Castelijau's algorithm, we calculate a new control point by interpolating between the current point and the next point using the parameter \(t\). Through every iteration, we get one less control point than before. Eventually, by iterating through this process, you will end up with a single point, which is the final answer. <br>
 
-		<h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
+			<figure>
+				<div style="display: flex; flex-direction: column; align-items: center;">
+					<table style="width: 100%; text-align: center; border-collapse: collapse;">
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part1_0.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part1_1.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part1_2.png" width="250px"/>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part1_3.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part1_4.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part1_5.png" width="250px"/>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part1_6.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part1_6_modified.png" width="250px"/>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<figcaption> <br>Figure 1: A demonstration of de Castelijau's algorithm to a surface with 6 control points. Starting from left to right, top to bottom, the first 6 images demonstrate the calculation of control points until we arrive at a final point \(t\). The 7th image shows the resultant curve and the 8th image shows the resultant curve when the positions of the control points are modified.  <br></figcaption>
+			</figure>
 
-		<h3>Part 3: Area-weighted vertex normals</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			<h3>Part 2: Bezier surfaces with separable 1D de Casteljau</h3>
 
-		<h3>Part 4: Edge flip</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			With surfaces, we build on top of de Castelijau's algorithm from Part 1 as the basis for a 1D evaluation. We have a 2D matrix of control points, which are evaluated first by calculating all the 1D curves based on the rows of the control points with some scalar interpolated value \(u\). Each 1D evaluation produces a single point, and the final point can be calculated as another 1D evaluation of all the previous points with some scalar interpolated value \(v\). <br>
 
-		<h3>Part 5: Edge split</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			<figure>
+				<img src="images/part2.png" width="750px"/>
+				<figcaption> <br> Figure 2: A Bezier surface of a teapot, demonstrating the 2D interpolation scheme based off 1D de Casteljau. Note the lack of surface normals resulting in an even surface shading. (However, it is certainly possible to compute and interpolate surface normals.) <br></figcaption>
+			</figure>
 
-		<h3>Part 6: Loop subdivision for mesh upsampling</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			<h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
 
-		<h2>(Optional) Section III: Potential Extra Credit - Art Competition: Model something Creative</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			<h3>Part 3: Area-weighted vertex normals</h3>
 
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
+			We loop through all the half edges pointing away from the vertex using <code>h->twin()->next()</code>, each of which corresponds to a separate face. We add <code>Face::normal()</code> to a running total since it is already normalized by the area of the face. (This is because the cross products of the vertices scale by the area, which are normalized out.) Finally, we normalize the total sum to get the normal corresponding to the vertex.
+
+			<figure>
+				<div style="display: flex; flex-direction: column; align-items: center;">
+					<table style="width: 100%; text-align: center; border-collapse: collapse;">
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part3_fn.png" width="375px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part3_vn.png" width="375px"/>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<figcaption><br> Figure 3: A comparison of flat shading (left), using only the face normals, and Phong shading (right), using interpolated vertex normals. Phong shading produces a much smoother shading of the surface without the need for a large, complex mesh. <br></figcaption>
+			</figure>
+
+			<h3>Part 4: Edge flip</h3>
+			We assume the first halfedge is BC and it's twin is CB. This gives us a systematic way to label all the knowns we have. We map the faces ABC &#x2192; ABD, DCB &#x2192; DCA and the edge (and corresponding half-edges) BC &#x2192; AD. Using this mapping, we can deduce the appropriate pointers for each half-edge. We also update the half-edge pointers for the vertices B, C and the faces, since they could be pointing to the old half-edge components. If the edge is a boundary edge, then we return immediately. <br>
+
+			For us, implementing the edge flip was relatively straightforward after our systematic labeling scheme, and no major bugs were encountered. <br>
+
+			<figure>
+				<img src="images/part4.png" width="750px"/>
+				<figcaption> <br> Figure 4: The teapot mesh with some edges flipped. Note several edge flip phenomena, such as depressions in the mesh creating shading artefacts, or near-degenerate flips creating triangles which seem to be larger than others. <br> </figcaption>
+			</figure>
+
+			<h3>Part 5: Edge split</h3>
+			Similar to an edge flip, we assume the edge being split is BC, and the corresponding half-edges are BC and CB. We label the current knowns, and the existing faces by their exterior half-edges CA and DC (which will correspond to CAM and DCM). We create: (1) 1 new vertex M with its position the mean of vertices B and C, mapping the edge BC &#x2192; MC, (2) 2 new faces ABM and BDM, (3) 3 edges MA, MB, MD, and (4) their 6 corresponding half-edges. The edge MB is part of the original edge BC, so for our Loop subdivision algorithm, it is technically considered an old edge. Like with our edge flip implementation, we set and update the half-edge pointers for existing and new half-edges based on the mapping defined above. We similarly update the half-edge pointers for the faces CAM and DCM, and the vertex B, since they could be pointing to old half-edge components which have changed. <br>
+
+			For us, implementing the edge split was difficult because we did not read the instructions carefully and forgot to set the position of the new vertex M to be the mean of vertices B and C.
+
+			<figure>
+				<div style="display: flex; flex-direction: column; align-items: center;">
+					<table style="width: 100%; text-align: center; border-collapse: collapse;">
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part5_s.png" width="375px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part5_sf.png" width="375px"/>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<figcaption><br> Figure 5: The teapot mesh with edges split (left) and edges split and flipped (right). Note that Loop subdivision consists of edge splits and flips, but without proper computation of vertex positions, shading artefacts caused by non-smooth face normals appear. <br></figcaption>
+			</figure>
+
+			If the edge is a boundary edge, then we do not need to consider the faces DCM and BDM. We create the new vertex similarly, mapping BC &#x2192; MC, but this time, there is only (1) 1 new face ABM, (2) 2 new edges MA, MB, and (3) their 4 corresponding half-edges. Similar to the above, the edge MB is not new under Loop subdivision rules. The half-edge pointers of face CAM and vertex B are updated. <br>
+
+			<figure>
+				<img src="images/part5_ec.png" width="750px"/>
+				<figcaption> <br> Figure 6: A demonstration of successful edge splits on a mesh with boundary edges. Only one new face is created per split. <br> </figcaption>
+			</figure>
+
+			<h3>Part 6: Loop subdivision for mesh upsampling</h3>
+			We implemented Loop subdivision using the steps described in the specification. This consists of
+			<ol>
+				<li>Computing new positions for existing vertices using the weighted sum of the existing vertex position \(p\), the sum of the neighbors' positions \(p_i\), and the number of neighbors \(n\) via the formula.
+				</li>
+				\[\begin{align*}
+				S(p) &= (1 - \alpha_n) p + \alpha_n \frac{1}{n} \sum_{i=0}^{n-1} p_i, \\
+				\alpha_n &= \begin{cases}
+				9/16 & n = 3, \\
+				3/8 & n > 3.
+				\end{cases}
+				\end{align*}\]
+				<li>Computing positions for new vertices formed by splitting edges by looping through existing edges (and indexing them for the step 3). We use a similar weighted sum of adjacent vertex positions, with a weight of \( \frac{3}{8} \) for near vertices and \( \frac{1}{8} \) for far vertices. Far halfedges (corresponding to far vertices) are computed <code>h->next()->next()</code> using the near halfedge <code>h</code> (corresponding to near vertices).
+				</li>
+				<li>Splitting every existing edge by iterating through the existing edge index and setting the position of the new vertex to the position calculated in step 2.</li>
+				<li>Flip any new edge that connects an old and new vertex.</li>
+				<li>Setting the position of the old vertices to the positions calculated in step 1.
+				</li>
+			</ol>
+
+			<figure>
+				<div style="display: flex; flex-direction: column; align-items: center;">
+					<table style="width: 100%; text-align: center; border-collapse: collapse;">
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part6_loop_cube_0.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_loop_cube_1.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_loop_cube_2.png" width="250px"/>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part6_loop_cube_3.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_loop_cube_4.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_loop_cube_5.png" width="250px"/>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<figcaption><br> Figure 7: Five successive Loop subdivisions applied to the cube mesh, starting at 0 subdivisions applied, and going first left to right then top to bottom. Observe the gradual smoothing of the cube's sharp edges. Because the cube mesh is fundamentally asymmetric, this also results in an asymmetric smoothed mesh. <br></figcaption>
+			</figure>
+
+			We can see that as a result of Loop subdivision, each triangular face is effectively split into four, which naturally causes the mesh to become smoother. Repositioning the location of the mesh vertices create a semi-interpolation of the face surface normal. As a result, sharp corners or edges, which visually result from rapid changes in the surface normal, are also smoothened as a result of this interpolation. This effect can be mitigated by presplitting edges near the sharp corners or edges, bringing the vertices closer together and hence, reducing the degree of interpolation. <br>
+
+			<figure>
+				<div style="display: flex; flex-direction: column; align-items: center;">
+					<table style="width: 100%; text-align: center; border-collapse: collapse;">
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part6_loop_presplit_0.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_loop_presplit_1.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_loop_presplit_2.png" width="250px"/>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<figcaption><br> Figure 8: A demonstration of how presplitting can help preserve sharp edges and corners, using the adversarial example of a cube mesh. The left figure demonstrates our presplitting near edges and corners, with a more extreme presplitting applied to the corner facing the viewer. The middle and right figures demonstrate through different perspective, the relative preservation of corners and edges compared to Figure 7. <br></figcaption>
+			</figure>
+
+			<figure>
+				<div style="display: flex; flex-direction: column; align-items: center;">
+					<table style="width: 100%; text-align: center; border-collapse: collapse;">
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part6_symmetric_0.png" width="350px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_symmetric_1.png" width="350px"/>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part6_symmetric_2.png" width="350px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_symmetric_final.png" width="350px"/>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<figcaption><br> Figure 9: A demonstration of how presplitting can help preserve symmetry, using the adversarial example of a cube mesh. Starting from left to right, top to bottom, we presplit edges so that the cube is symmetric. As shown in the next two figures, for each successive subdivision, we flip and split certain edges to continually ensure symmetry. After several subdivisions, the final figure demonstrates the relative preservation of symmetry compared to Figure 7. <br></figcaption>
+			</figure>
+
+			For us, Loop subdivision was relatively difficult to debug (and not due to some silly error). We encountered several issues with keeping track of new and old edges, and resetting the intermediete new positions properly. <br>
+
+			For extra credit, we implemented \(\sqrt{3}\) subdivision according to the original 2000 paper by <a href="https://www.graphics.rwth-aachen.de/media/papers/sqrt31.pdf">Leif Kobbelt</a>. We first implement a function to split a face into three faces. We assume the half-edge pointer of the input face is the edge AB, and label the knowns. We then create (1) 1 new vertex M with its position the mean of the vertices A, B, C, (2) 2 new faces BCM, CAM (mapping the existing face ABC &#x2192; ABM), (3) 3 new edges MA, MB, MC, and (4) their 6 corresponding half-edges. Beyond updating and setting new and existing half-edge pointers, we only need to additionally update the half-edge pointer of the input face. <br>
+
+			The algorithm compared to Loop subdivision is then remarkably similar, consisting of the steps
+			<ol>
+				<li>Computing new positions for existing vertices using the same formula, except with</li>
+				\[ \alpha_n = \frac{4 - 2 \cos \left( \frac{2\pi}{n} \right) }{9} \]
+				<li>Indexing then splitting every existing face in the mesh.</li>
+				<li>Flipping all original edges.</li>
+				<li>Setting the position of the old vertices to the positions calculated in step 1.</li>
+			</ol>
+
+			<figure>
+				<div style="display: flex; flex-direction: column; align-items: center;">
+					<table style="width: 100%; text-align: center; border-collapse: collapse;">
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part6_iso_0.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_iso_1.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_iso_2.png" width="250px"/>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part6_iso_3.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_iso_4.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_iso_5.png" width="250px"/>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<figcaption><br> Figure 10: Five successive \(\sqrt{3}\) subdivisions applied to the icosahedron mesh, starting at 0 subdivisions applied, and going first left to right then top to bottom. Observe how a 60 degree rotation is applied after each subdivision, and a 9:1 split is applied every other subdivision (hence the name \(\sqrt{3}\)). <br></figcaption>
+			</figure>
+
+			The beauty of \(\sqrt(3)\) subdivision is that the implementation already supports boundary edges out of the box. Splitting faces and updating the position of existing vertices both work independently of whether or not a connected edge is a boundary.
+
+			<figure>
+				<div style="display: flex; flex-direction: column; align-items: center;">
+					<table style="width: 100%; text-align: center; border-collapse: collapse;">
+						<tr>
+							<td style="text-align: center;">
+								<img src="images/part6_beetle_0.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_beetle_1.png" width="250px"/>
+							</td>
+							<td style="text-align: center;">
+								<img src="images/part6_beetle_2.png" width="250px"/>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<figcaption><br> Figure 11: Two successive \(\sqrt{3}\) subdivisions applied to the bettle mesh, starting at 0 subdivisions applied, and going left to right. Observe no abnormalities arise despite the prescence of boundary edges. <br></figcaption>
+			</figure>
+
+			<h2>(Optional) Section III: Potential Extra Credit - Art Competition: Model something Creative</h2>
+
+			Skipped for now!
+
 		</div>
 	</body>
 </html>
