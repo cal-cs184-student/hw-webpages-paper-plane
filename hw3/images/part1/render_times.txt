@@ -1,0 +1,45 @@
+[PathTracer] Input scene file: ../dae/sky/CBspheres_lambertian.dae
+[PathTracer] Rendering using 1 threads
+[PathTracer] Collecting primitives... Done! (0.0000 sec)
+[PathTracer] Building BVH from 14 primitives... Done! (0.0000 sec)
+[PathTracer] Rendering... 100%! (0.1198s)
+[PathTracer] BVH traced 480000 rays.
+[PathTracer] Average speed 4.0067 million rays per second.
+[PathTracer] Averaged 14.000000 intersection tests per ray.
+[PathTracer] Saving to file: CBspheres.png... Done!
+[PathTracer] Job completed.
+soniachacon@Sonias-MacBook-Pro cmake-build-debug % ./pathtracer -r 800 600 -f banana.png ../dae/keenan/banana.dae
+
+[PathTracer] Input scene file: ../dae/keenan/banana.dae
+[PathTracer] Rendering using 1 threads
+[PathTracer] Collecting primitives... Done! (0.0005 sec)
+[PathTracer] Building BVH from 2458 primitives... Done! (0.0007 sec)
+[PathTracer] Rendering... 100%! (23.1855s)
+[PathTracer] BVH traced 480000 rays.
+[PathTracer] Average speed 0.0207 million rays per second.
+[PathTracer] Averaged 2458.000000 intersection tests per ray.
+[PathTracer] Saving to file: banana.png... Done!
+[PathTracer] Job completed.
+
+[PathTracer] Input scene file: ../dae/meshedit/teapot.dae
+[PathTracer] Rendering using 1 threads
+[PathTracer] Collecting primitives... Done! (0.0006 sec)
+[PathTracer] Building BVH from 2464 primitives... Done! (0.0007 sec)
+[PathTracer] Rendering... 100%! (22.6083s)
+[PathTracer] BVH traced 480000 rays.
+[PathTracer] Average speed 0.0212 million rays per second.
+[PathTracer] Averaged 2464.000000 intersection tests per ray.
+[PathTracer] Saving to file: teapot.png... Done!
+[PathTracer] Job completed.
+soniachacon@Sonias-MacBook-Pro cmake-build-debug % ./pathtracer -r 800 600 -f cow.png ../dae/meshedit/cow.dae
+
+[PathTracer] Input scene file: ../dae/meshedit/cow.dae
+[PathTracer] Rendering using 1 threads
+[PathTracer] Collecting primitives... Done! (0.0012 sec)
+[PathTracer] Building BVH from 5856 primitives... Done! (0.0017 sec)
+[PathTracer] Rendering... 100%! (52.7534s)
+[PathTracer] BVH traced 480000 rays.
+[PathTracer] Average speed 0.0091 million rays per second.
+[PathTracer] Averaged 5856.000000 intersection tests per ray.
+[PathTracer] Saving to file: cow.png... Done!
+[PathTracer] Job completed.

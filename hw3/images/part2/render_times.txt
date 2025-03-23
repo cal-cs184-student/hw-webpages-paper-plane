@@ -1,0 +1,82 @@
+[PathTracer] Input scene file: ../dae/meshedit/cow.dae
+[PathTracer] Rendering using 1 threads
+[PathTracer] Collecting primitives... Done! (0.0012 sec)
+[PathTracer] Building BVH from 5856 primitives... Done! (0.0014 sec)
+[PathTracer] Rendering... 100%! (0.1540s)
+[PathTracer] BVH traced 480000 rays.
+[PathTracer] Average speed 3.1172 million rays per second.
+[PathTracer] Averaged 2.351138 intersection tests per ray.
+[PathTracer] Saving to file: cow_bvh.png... Done!
+[PathTracer] Job completed.
+soniachacon@Sonias-MacBook-Pro cmake-build-debug % ./pathtracer -r 800 600 -f teapot_bvh.png ../dae/meshedit/teapot.dae
+
+[PathTracer] Input scene file: ../dae/meshedit/teapot.dae
+[PathTracer] Rendering using 1 threads
+[PathTracer] Collecting primitives... Done! (0.0005 sec)
+[PathTracer] Building BVH from 2464 primitives... Done! (0.0007 sec)
+[PathTracer] Rendering... 100%! (0.1290s)
+[PathTracer] BVH traced 480000 rays.
+[PathTracer] Average speed 3.7210 million rays per second.
+[PathTracer] Averaged 1.972873 intersection tests per ray.
+[PathTracer] Saving to file: teapot_bvh.png... Done!
+[PathTracer] Job completed.
+soniachacon@Sonias-MacBook-Pro cmake-build-debug % ./pathtracer -r 800 600 -f banana_bvh.png ../dae/keenan/banana.dae
+
+[PathTracer] Input scene file: ../dae/keenan/banana.dae
+[PathTracer] Rendering using 1 threads
+[PathTracer] Collecting primitives... Done! (0.0006 sec)
+[PathTracer] Building BVH from 2458 primitives... Done! (0.0008 sec)
+[PathTracer] Rendering... 100%! (0.1041s)
+[PathTracer] BVH traced 480000 rays.
+[PathTracer] Average speed 4.6088 million rays per second.
+[PathTracer] Averaged 1.073231 intersection tests per ray.
+[PathTracer] Saving to file: banana_bvh.png... Done!
+[PathTracer] Job completed.
+soniachacon@Sonias-MacBook-Pro cmake-build-debug % ./pathtracer -r 800 600 -f CBspheres_bvh.png ../dae/sky/CBspheres_lambertian.dae
+
+[PathTracer] Input scene file: ../dae/sky/CBspheres_lambertian.dae
+[PathTracer] Rendering using 1 threads
+[PathTracer] Collecting primitives... Done! (0.0000 sec)
+[PathTracer] Building BVH from 14 primitives... Done! (0.0000 sec)
+[PathTracer] Rendering... 100%! (0.0894s)
+[PathTracer] BVH traced 480000 rays.
+[PathTracer] Average speed 5.3706 million rays per second.
+[PathTracer] Averaged 2.179479 intersection tests per ray.
+[PathTracer] Saving to file: CBspheres_bvh.png... Done!
+[PathTracer] Job completed.
+
+
+
+soniachacon@Sonias-MacBook-Pro cmake-build-debug % ./pathtracer -t 8 -r 800 600 -f ../writeup_images/part2/lucy_large.png ../dae/sky/CBlucy.dae
+[PathTracer] Input scene file: ../dae/sky/CBlucy.dae
+[PathTracer] Rendering using 8 threads
+[PathTracer] Collecting primitives... Done! (0.0299 sec)
+[PathTracer] Building BVH from 133796 primitives... Done! (0.0708 sec)
+[PathTracer] Rendering... 100%! (0.0438s)
+[PathTracer] BVH traced 252173 rays.
+[PathTracer] Average speed 5.7563 million rays per second.
+[PathTracer] Averaged 1.959361 intersection tests per ray.
+[PathTracer] Saving to file: ../writeup_images/part2/lucy_large.png... Done!
+[PathTracer] Job completed.
+soniachacon@Sonias-MacBook-Pro cmake-build-debug % ./pathtracer -t 8 -r 800 600 -f ../writeup_images/part2/dragon_large.png ../dae/sky/CBdragon.dae
+[PathTracer] Input scene file: ../dae/sky/CBdragon.dae
+[PathTracer] Rendering using 8 threads
+[PathTracer] Collecting primitives... Done! (0.0319 sec)
+[PathTracer] Building BVH from 100012 primitives... Done! (0.0753 sec)
+[PathTracer] Rendering... 100%! (0.0497s)
+[PathTracer] BVH traced 309087 rays.
+[PathTracer] Average speed 6.2177 million rays per second.
+[PathTracer] Averaged 1.997522 intersection tests per ray.
+[PathTracer] Saving to file: ../writeup_images/part2/dragon_large.png... Done!
+[PathTracer] Job completed.
+soniachacon@Sonias-MacBook-Pro cmake-build-debug % ./pathtracer -t 8 -r 800 600 -f ../writeup_images/part2/maxplanck_large.png ../dae/meshedit/maxplanck.dae
+[PathTracer] Input scene file: ../dae/meshedit/maxplanck.dae
+[PathTracer] Rendering using 8 threads
+[PathTracer] Collecting primitives... Done! (0.0122 sec)
+[PathTracer] Building BVH from 50801 primitives... Done! (0.0248 sec)
+[PathTracer] Rendering... 100%! (0.0565s)
+[PathTracer] BVH traced 289097 rays.
+[PathTracer] Average speed 5.1145 million rays per second.
+[PathTracer] Averaged 2.353452 intersection tests per ray.
+[PathTracer] Saving to file: ../writeup_images/part2/maxplanck_large.png... Done!
+[PathTracer] Job completed.
