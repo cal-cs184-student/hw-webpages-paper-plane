@@ -1,109 +1,343 @@
 <html>
-	<head>
-		<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=default'></script>
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-		<style>
-			h1 {
-				text-align: center;
-			}
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=default"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      h1 {
+        text-align: center;
+      }
 
-			.container {
-				margin: 0 auto;
-				padding: 60px 20%;
-			}
+      .container {
+        margin: 0 auto;
+        padding: 60px 20%;
+      }
 
-			figure {
-				text-align: center;
-			}
+      figure {
+        text-align: center;
+      }
 
-			img {
-				display: inline-block;
-			}
+      img {
+        display: inline-block;
+      }
 
-			body {
-				font-family: 'Inter', sans-serif;
-			}
-		</style>
-	</head>
-	<body>
-		<div class="container">
-		<h1>CS184/284A Spring 2025 Homework 4 Write-Up</h1>
-		<div style="text-align: center;">Names: </div>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>CS184/284A Spring 2025 Homework 4 Write-Up</h1>
+      <div style="text-align: center">Names: James Ni and Sonia Chacon</div>
 
-		<br>
+      <br />
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+      Link to webpage:
+      <a href="https://cal-cs184-student.github.io/hw-webpages-paper-plane"
+        >cal-cs184-student.github.io/hw-webpages-paper-plane/hw4</a
+      >
 
-		<br>
+      <br />
 
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+      Link to GitHub repository:
+      <a href="https://github.com/cal-cs184-student/sp25-hw4-paper-cut"
+        >github.com/cal-cs184-student/sp25-hw4-paper-cut</a
+      >
 
-		<figure>
-			<img src="clothsim.png" alt="Cloth draped over sphere" style="width:70%"/>
-			<figcaption>You can add images with captions!</figcaption>
-		</figure>
-
-		<!--
+      <!--
 		We've already added one heading per part, to make your write-up as navigable when grading. Please fit your write-up within these sections!
 		-->
 
-		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+      <h2>Overview</h2>
+      In this homework, we implemented various aspects of a cloth simulation. First, we needed to construct a model of our cloth which we modeled as a grid of point masses attached to each other by structural, bending, and shearing springs. We then used physics concepts to model the force on each point mass for a particular time step. The total force on each point mass is the sum of forces from external accelerations (such as gravity) and forces from springs. Once the total force was calculated, a point mass's new position could be calculated from its current position and acceleration, also using damping in order to simulate loss of energy. We extended this simulation to account for the cloth colliding with other objects, by determining if there is a point of intersection between a point mass and an object and bumps it to the surface of the object if there is a collision. Additionally, we accounted for self-collisions, which models how the cloth could fold upon itself, implemented using spatial hashing. Finally, we wrote GLSL shader programs to speed up the light rendering process in order to handle shading in real time animation.
 
-		<h2>Part 1: Masses and springs</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      <h2>Part 1: Masses and springs</h2>
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
-		<div style="display: flex; flex-direction: column; align-items: center;">
-			<table style="width: 100%; text-align: center; border-collapse: collapse;">
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="clothsim.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="clothsim.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="clothsim.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="clothsim.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			</table>
-		</div>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <figure>
+          <table style="width: 100%; text-align: center; border-collapse: collapse">
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part1/all_constraints.png" width="300px"/>
+                <figcaption>All constraints enabled</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part1/only_shearing.png" width="300px"/>
+                <figcaption>Only shearing constraints</figcaption>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part1/without_shearing.png" width="300px"/>
+                <figcaption>Without shearing constraint</figcaption>
+              </td>
+            </tr>
+          </table>
+          <figcaption><br>Figure 1: Visualization of the various spring constraint elements to simulate the cloth. <br></figcaption>
+        </figure>
+      </div>
 
-		<h2>Part 2: Simulation via numerical integration</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      <h2>Part 2: Simulation via numerical integration</h2>
+      Changing the spring constant affects the look of the cloth. When the spring constant is low, there are more folds in the cloth, as opposed to a high spring constant that has less folds. This is because increasing the spring constant increases the spring force, which causes the spring to become more stiff and resistant to bending. This is why in the cloth, less folds appear. When the spring constant is lower, there is less spring force meaning the springs are less resistant to bending causing more folds. <br><br>
 
-		<h2>Part 3: Handling collisions with other objects</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <figure>
+          <table style="width: 100%; text-align: center; border-collapse: collapse">
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part2/low_ks.png" width="300px" />
+                <figcaption>Low spring constant (\(K_s\) = 100)</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part2/high_ks.png" width="300px" />
+                <figcaption>High spring constant (\(K_s\) = 10000)</figcaption>
+              </td>
+            </tr>
+          </table>
+          <figcaption><br>Figure 2: Physical effects of the spring constant on cloth simulation. <br></figcaption>
+        </figure>
+      </div>
 
-		<h2>Part 4: Handling self-collisions</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      Changing density affects the mass of point masses. Having a higher density increases the mass of the point masses. The total force calculated on a point is F = ma, where F is the sum of all forces. In the images, the forces are the sum between gravitational force and spring force. By increasing mass, gravitational force is proportionally increased, but spring force remains the same. Thus, the effect of a higher density is increased mass, which means acceleration is decreased. Inversely, decreasing density increases the acceleration. The result in the simulation is that increasing density means the cloth falls slower, while decreasing density means the cloth falls faster. <br><br>
 
-		<h2>Part 5: Shaders</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <figure>
+          <img src="images/part2/low_damping.png" width="300px"/>
+          <figcaption><br>Figure 3: Low damping causes the cloth to swing behind itself. <br></figcaption>
+        </figure>
+      </div>
 
-		<h2>(Optional) Part 6: Extra Credit - Additional cloth simulation features!</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-		
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
-		</div>
-	</body>
+      Damping is used to account for the loss of energy due to physical phenomena such as friction and heat loss. Increasing the damping means increasing the loss of energy, which visually represented in the simulation with the cloth falling slower. Decreasing the damping decreases the loss of energy, so the cloth moves much faster and even extends the other way when it reaches the bottom due to the additional energy affecting the position. <br><br>
+
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <figure>
+          <img src="images/part2/default_param.png" width="300px"/>
+          <figcaption><br>Figure 4: A hanging cloth simulated and rendered with default parameters. <br></figcaption>
+        </figure>
+      </div>
+
+      <h2>Part 3: Handling collisions with other objects</h2>
+      Our implementation of sphere and plane collisions are true to the steps described in the specifications. We compute if a particle intersects a sphere based on the distance to the origin. We then compute a tangent point by projecting the particle onto the surface of the sphere, and apply a correction based on the last position of the particle, scaled by \(1 - f\) to simulate the effect of friction \(f\). For a plane, intersection is defined if the particle crosses the plane. Converting all coordinates relative to a point on the plane, we compute \(p_t \cdot n\) and \(p_{t-1} \cdot n\). If the dot products have opposite signs, then the particle has crossed. We compute the tangent point assuming the particle travels in a straight line between \(p_{t-1}\) and \(p_t\), and similarly apply a correction to the above case, but additionally multiplied by \(1 - s\), where \(s\) is a surface offset representing the thickness of the plane. <br><br>
+
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <figure>
+          <table style="width: 100%; text-align: center; border-collapse: collapse">
+            <tr>
+              <td style="text-align: center" colspan="2">
+                <img src="images/part3/default_ks.png" width="300px" />
+                <figcaption>Default parameters</figcaption>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part3/small_ks.png" width="300px" />
+                <figcaption>Low spring constant \((K_s = 500)\)</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part3/large_ks.png" width="300px" />
+                <figcaption>High spring constant \((K_s = 50000)\)</figcaption>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part3/plane.png" width="300px" />
+                <figcaption>Cloth lying on plane</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part3/plane_closeup.png" width="300px"/>
+                <figcaption>Close up showing the cloth texture</figcaption>
+              </td>
+            </tr>
+          </table>
+          <figcaption><br>Figure 5: Cloth collisions with spheres and planes. The top 3 images depict sphere collisions with varying physical parameters, while the bottom 2 images depict plane collisions with varying viewing detail. <br></figcaption>
+        </figure>
+      </div>
+
+      <h2>Part 4: Handling self-collisions</h2>
+      In order to optimize self-collisions, we build a spatial map of the particles using a hashing function. The hash function partitions a simulation space of dimensions \((w, h, \max(w, h)\) into rectangular regions of size \((3w/n_w, 3h/n_h, \max(3w/n_w, 3h/n_h))\), where \(n_w, n_h\) are the particle width and height of our cloth. Our hash function is deterministically chosen assuming a limited simulation space to guarantee no rectangular regions within the simulation space collide. This is better than choosing arbitrary magic numbers, but causes particles outside the simulation space to have a high probability of collision. However, the well-behaved deformation of the cloth never causes this to occur in our simulations. <br><br>
+
+      Each particle is mapped to a list of particles based on its spatial position, and self-collision checks are only performed between particles in the same spatial list. We model the cloth as a collection of particles of radius \(\text{thickness}\). If a particle is within \(2*\text{thickness}\) of another particle, a correction is applied to ensure the particle remains sufficiently far away. If a particle collides with many particles, then we average the corrections together. <br><br>
+
+      In our simulations, we encountered a critical bug where the vertical cloth's initial position starts with contact to the ground plane, causing the cloth to act as a spring and clip through the plane when the force exceeds some threshold. This was resolved by bumping the entire cloth (and its constituent points) by 0.1 units in the y-axis. <br><br>
+
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <figure>
+          <table style="width: 100%; text-align: center; border-collapse: collapse">
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part4/initial_selfcollision.png" width="250px"/>
+                <figcaption>Initial</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part4/middle_selfcollision.png" width="250px"/>
+                <figcaption>Midpoint</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part4/end_selfcollision.png" width="250px"/>
+                <figcaption>End</figcaption>
+              </td>
+            </tr>
+          </table>
+          <figcaption><br>Figure 6: A cloth falling on itself, demonstrating physically accurate self-collision. <br></figcaption>
+        </figure>
+      </div>
+
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <figure>
+          <table style="width: 100%; text-align: center; border-collapse: collapse">
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part4/high_ks_initial.png" width="300px"/>
+                <figcaption>High \(K_s\) (initial)</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part4/high_ks_end.png" width="300px"/>
+                <figcaption>High \(K_s\) (end)</figcaption>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part4/low_ks_initial.png" width="300px"/>
+                <figcaption>Low \(K_s\) (initial)</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part4/low_ks_end.png" width="300px" />
+                <figcaption>Low \(K_s\) (end)</figcaption>
+              </td>
+            </tr>
+          </table>
+          <figcaption><br>Figure 7: A cloth falling on itself, with varying physical (spring) parameters. High and low values of \(K_s\) use the same definitions in Figure 5.<br></figcaption>
+        </figure>
+      </div>
+
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <figure>
+          <table style="width: 100%; text-align: center; border-collapse: collapse">
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part4/low_density_initial.png" height="250px"/>
+                <figcaption>\(D = 5g/cm^2\), (Initial)</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part4/low_density_near_end.png" height="250px"/>
+                <figcaption>\(D = 5g/cm^2\), (Near End)</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part4/low_density_end.png" height="250px"/>
+                <figcaption>\(D = 5g/cm^2\), (End)</figcaption>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part4/high_density_initial.png" height="250px"/>
+                <figcaption>\(D = 30g/cm^2\), (Initial)</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part4/high_density_near_end.png" height="250px"/>
+                <figcaption>\(D = 30g/cm^2\), (Near End)</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part4/high_density_end.png" height="250px"/>
+                <figcaption>\(D = 30g/cm^2\), (End)</figcaption>
+              </td>
+            </tr>
+          </table>
+          <figcaption><br>Figure 8: The final states of a cloth falling on itself, with varying physical (density) parameters. For reference, the default density is \(D = 15g/cm^2\). <br></figcaption>
+        </figure>
+      </div>
+
+      <h2>Part 5: Shaders</h2>
+      In order to have realistic lighting and material effects with a real-time particle simulation, raytracing, even accelerated, is infeasible on most hardware. Instead, we rely on shaders, programs which run on the GPU in between the application and display. Vertex shaders (defined in GLSL's <code>.vert</code>) compute important rendering properties at all specified vertices in the scene, whereas fragment shaders (defined in GLSL's <code>.frag</code>) compute the actual display properties at all the pixels in the scene using a barycentric interpolation of the per-vertex properties. Many effects, either physically grounded or completely stylized, can be approximated through these per-vertex and per-pixel property calculations. <br><br>
+
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <figure>
+          <table style="width: 100%; text-align: center; border-collapse: collapse">
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part5/ambient.png" width="300px" />
+                <figcaption>Only Ambient</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part5/diffuse.png" width="300px" />
+                <figcaption>Only Diffuse</figcaption>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part5/specular.png" width="300px" />
+                <figcaption>Only Specular</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part5/phong.png" width="300px" />
+                <figcaption>Blinn-Phong</figcaption>
+              </td>
+            </tr>
+          </table>
+          <figcaption><br>Figure 9: The different lighting contributions of the Blinn-Phong lighting model. <br></figcaption>
+        </figure>
+      </div>
+
+      In particular, Blinn-Phong shading can approximate the lighting effects of specular and diffuse materials without the need for raytracing. The shader models three physical contributions to the appearance of a surface: ambient light, diffuse reflections, and specular highlights. Ambient light is irrespective of both source angle and viewer angle, and models the minimum global contribution of a light raytraced to any point in the scene. Diffuse reflection models directly illuminated light which scatters evenly across a surface, and is therefore only irrespective of viewing angle. Finally, specular highlights models finer details of a material, where the reflected light is not uniformly distributed. <br><br>
+
+      <figure>
+        <img src="images/part5/custom_texture.png" width="300px"/>
+        <figcaption><br>Figure 10: A texture shading model, using the raytraced bunny from Homework 3 for the cloth's texture. <br></figcaption>
+      </figure>
+
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <figure>
+          <table style="width: 100%; text-align: center; border-collapse: collapse">
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part5/16-bump.png" width="300px"/>
+                <figcaption>Bump (16x16 cloth res)</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part5/16-displacement.png" width="300px"/>
+                <figcaption>Displacement (16x16 cloth res)</figcaption>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part5/128-bump.png" width="300px"/>
+                <figcaption>Bump (128x128 cloth res)</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part5/128-displacement.png" width="300px"/>
+                <figcaption>Displacement (128x128 cloth res)</figcaption>
+              </td>
+            </tr>
+          </table>
+          <figcaption><br>Figure 11: Bump and displacement shaders at varying cloth resolution, simulating depth effects and lighting using Blinn-Phong. Both shaders use an underlying brick wall texture. Bump shaders use a normal of 2 and height of 1, whereas displacement shaders use a normal of 10 and height of 0.5. Displacement mapping additionally alters the per-pixel position in addition to the per-pixel normal adjustment from bump mapping. This produces a more realistic perception of depth, even with a smaller height value. Increasing the resolution of the cloth smoothens the texture by effectively increasing the per-vertex sampling rate, reducing aliasing. <br></figcaption>
+        </figure>
+      </div>
+
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <figure>
+          <table style="width: 100%; text-align: center; border-collapse: collapse">
+            <tr>
+              <td style="text-align: center">
+                <img src="images/part5/mirror_cloth.png" width="300px"/>
+                <figcaption>Mirror cloth</figcaption>
+              </td>
+              <td style="text-align: center">
+                <img src="images/part5/mirror_sphere.png" width="300px"/>
+                <figcaption>Mirror sphere</figcaption>
+              </td>
+            </tr>
+          </table>
+          <figcaption><br>Figure 12: A mirror shading model. <br></figcaption>
+        </figure>
+      </div>
+
+      <h2>
+        (Optional) Part 6: Extra Credit - Additional cloth simulation features!
+      </h2>
+      We did not attempt any extra credit features.
+
+    </div>
+  </body>
 </html>
